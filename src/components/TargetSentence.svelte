@@ -23,14 +23,14 @@ $: {
 // This is also horrible. Also one of these İİ's is one of those two char thing 
 const re = /[\w'ÇĞIİİÖŞÜçğıi̇öşü]+|\s+|[^\s\w]+/gu
 
-$: spanList = sentence.match(re);
+$: spanList = processList(sentence.match(re), word);
 
 // refactor
 function handleSubmit(event) {
     const icon = document.querySelector(".correct-tick")
     const inputs = document.querySelectorAll(".text-input")
     if (event.key === 'Enter') {
-        if (word.toLowerCase() === answer.toLowerCase()) {     
+        if ( answer.toLowerCase() === clean(word) ) {     
             inputs.forEach((input) => {
                 icon.innerHTML = "&#x2714;"; 
                 icon.style.color = "green";
@@ -44,7 +44,8 @@ function handleSubmit(event) {
             setTimeout(() => {
                 document.querySelector(".correct-tick").innerHTML = "";
                 document.querySelector(".text-input").style.backgroundColor = "#e9ebf1";
-                dispatch('sucess');
+                if ( hintStage == 0 ) dispatch('firstTimeSuccess');
+                else dispatch('success')
             }, 1000);
             
         } else {
@@ -59,7 +60,7 @@ function handleSubmit(event) {
                 document.querySelector(".correct-tick").innerHTML = "";
                 document.querySelector(".text-input").style.color = "#333";
                 document.querySelector(".text-input").style.backgroundColor = "#e9ebf1";
-                hint = word.slice(0, ++hintStage);
+                hint = clean(word).slice(0, ++hintStage);
                 answer = ""
             }, 250);
         }      
@@ -69,7 +70,7 @@ function handleSubmit(event) {
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext("2d");
 ctx.font = "25px Helvetica";
-$: textWidth = 1 + Math.ceil(ctx.measureText(word).width);
+$: textWidth = 1 + Math.ceil(ctx.measureText(clean(word)).width);
 
 function handleLoad() {
     const inputs = document.querySelectorAll(".text-input")
@@ -78,11 +79,33 @@ function handleLoad() {
 
 afterUpdate(handleLoad);
 
+function processList(spanList, word) { 
+    return spanList.map(span => {
+        if ( word.startsWith("-") && span.endsWith(word.slice(1)) ) {
+            return [span.substr(0, span.length - word.length + 1), span.substr(-word.length + 1, span.length)] 
+        } else {
+            return span;
+        }
+    }).flat();
+}
+
+function compare(word, span) {
+    if ( word.startsWith("-") ) {
+        return span.toLowerCase() === word.toLowerCase().slice(1);
+    }
+    return span.toLowerCase() === word.toLowerCase();
+}
+
+function clean(word) {
+    if ( word.startsWith("-") ) return word.toLowerCase().slice(1);
+    else return word.toLowerCase();
+}
+
 </script>
 
 
 {#each spanList as span}
-    {#if span.toLowerCase() === word.toLowerCase()}
+    {#if ( compare(word, span) )}
         <input 
             class="text-input" 
             type="text" 

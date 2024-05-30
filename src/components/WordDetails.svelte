@@ -6,8 +6,8 @@
 
     ////////// For word object bundled with site //////////
 
-    // import words from '../stores/words.js'; 
-    // $: wordObj = words.find((word) => word.id == activeId); 
+    import words from '../stores/words.js'; 
+    $: wordObj = words.find((word) => word.id == activeId); 
 
     ///////////////////////////////////////////////////////
 
@@ -25,13 +25,13 @@
         "english_sentence": "Ankara and Istanbul are some of Turkey’s larger cities."
     }
 
-    $: url = `http://localhost:3060/words/${activeId}`
+    // $: url = `http://localhost:8080/words/${activeId}`
 
-    $: {
-        fetch(url)
-        .then(res => res.json())
-        .then(data => { wordObj = data; })
-    }
+    // $: {
+    //     fetch(url)
+    //     .then(res => res.json())
+    //     .then(data => { wordObj = data; })
+    // }
     
     ///////////////////////////////////////////////////
 
@@ -47,10 +47,11 @@
     function createSet(bins) {
         let set = []
         bins.forEach(bin => bin.forEach(item => {
-            if ( (Math.random() > 0.8) && (set.length <= 40) ) {
+            if ( (Math.random() > 0.8) && (set.length <= 10) ) {
                 set = [...set, item] 
             } 
         }))
+        console.log(bins); /////////////// debug
         return set;
     }
 
@@ -101,20 +102,26 @@
 
     let set = createSet(bins);
 
-    console.log(set)
-
     let activeId = 1;
-    activeId = set.shift(); // <-----------DEBUG
-    console.log(activeId);
+    // activeId = set.shift(); // <-----------DEBUG
 
-    function handleSuccess() {
-        activeId = set.shift();
+    function handleSuccess() {   
+        bins = demote(bins, activeId);
+        if ( !set.length ) set = createSet(bins);   
+        activeId = set.shift();     
     }
+
+    function handlefirstTimeSuccess() {   
+        bins = promote(bins, activeId);
+        if ( !set.length ) set = createSet(bins);
+        activeId = set.shift();       
+    }
+
 
 </script>
 
     <Card>
-    <p class="target-sentence"><TargetSentence {wordObj} on:sucess={handleSuccess}/><span class="correct-tick"></span></p>
+    <p class="target-sentence"><TargetSentence {wordObj} on:firstTimeSuccess={handlefirstTimeSuccess} on:success={handleSuccess}/><span class="correct-tick"></span></p>
     <p class="word-type">{wordObj.type}</p>
     <hr>
     <p class="source-word">{wordObj.english_word} </p>

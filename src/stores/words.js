@@ -180,7 +180,7 @@ const words = [
     },
     {
        "id": 23,
-       "turkish_word": "ki",
+       "turkish_word": "-ki",
        "english_word": "that",
        "type": "adj",
        "turkish_sentence": "Oradaki çantayı bana verir misin?",

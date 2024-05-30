@@ -1,6 +1,6 @@
 <header>
-    <img class="source-flag" src="/img/gb.svg" alt="Flag of UKGBNI">
-    <img class="target-flag" src="/img/tr.svg" alt="Flag of Turkey">
+    <img class="source-flag" src="./img/gb.svg" alt="Flag of UKGBNI">
+    <img class="target-flag" src="./img/tr.svg" alt="Flag of Turkey">
 </header>
 
 <style>
